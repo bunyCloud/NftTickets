@@ -115,6 +115,33 @@ contract TicketNftV1 is ERC721Upgradeable, IEditionSingleMintable,  OwnableUpgra
   }
 
 
+function purchaseMultiple(uint256 numTokens) external payable returns (uint256) {
+    require(numTokens <= maxTokens, "You are trying to mint more tokens than allowed in one transaction");
+    require(numTokens <= numberCanMint(), "The number of tokens you are trying to mint exceeds the number of tokens left");
+    require(balanceOf(msg.sender) + numTokens <= maxTokens, "The total number of tokens you are trying to own exceeds the maximum tokens allowed per address");
+    require(active, "Event has not started. Owner must setApprovedMinter");
+    require(msg.value == numTokens * salePrice, "Insufficient ether sent for the number of tokens");
+    address[] memory toMint = new address[](numTokens);
+    for (uint256 i = 0; i < numTokens; i++) {
+        toMint[i] = msg.sender;
+    }
+    mintedTokens[msg.sender] = true;
+    EntryCount += numTokens;
+    nftTokenIds.push(EntryCount);
+    uint256 entryTime = block.timestamp;
+    for (uint256 i = 0; i < numTokens; i++) {
+        Entry memory x = Entry(msg.sender, EntryCount - i, entryTime);
+        entry.push(x);
+    }
+    if (EntryCount >= editionSize) {
+        isComplete = true;
+        active = false;
+    }
+    emit TicketSold(salePrice, msg.sender, EntryCount, entryTime);
+    return _mintEditions(toMint);
+}
+
+
    
 
 function getOwner(uint _id) public view returns (address) {
