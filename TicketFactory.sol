@@ -49,7 +49,7 @@ contract TicketFactory is OwnableUpgradeable {
    
     function createEdition(
         string memory _description,
-        //string memory _animationUrl,
+        string memory _animationUrl,
         string memory _imageUrl,
         uint256 _editionSize,
         uint256 _salePrice,
@@ -82,7 +82,7 @@ contract TicketFactory is OwnableUpgradeable {
     collectionCount ++;
         return newId;
     }
-   function setBunyBankAddress(address payable organizerBank) external onlyOwner {
+   function setOrganizerBankAddress(address payable organizerBank) external onlyOwner {
         require(organizerBank != address(0), "Invalid address");
         _organizerBank = organizerBank;
     }
